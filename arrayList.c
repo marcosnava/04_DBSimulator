@@ -23,6 +23,7 @@ BOOLEAN ALadicionar(struct ALregistro *reg, int *nReg)
         strcpy(ALlista[ALposicao].nome, reg->nome);
         strcpy(ALlista[ALposicao].endereco, reg->endereco);
         strcpy(ALlista[ALposicao].telefone, reg->telefone);
+        ALlista[ALposicao].excluido = ' ';
         *nReg = ALposicao;
         ALposicao++;
         return TRUE;
@@ -42,6 +43,10 @@ BOOLEAN ALbuscarPorIndice(int indice, struct ALregistro *reg)
     }
     else
     {
+        if(ALlista[indice].excluido == '*')
+        {
+            return FALSE;
+        }
         strcpy(reg->nome, ALlista[indice].nome);
         strcpy(reg->endereco, ALlista[indice].endereco);
         strcpy(reg->telefone, ALlista[indice].telefone);
@@ -56,11 +61,26 @@ int ALbuscarPorValor(struct ALregistro *reg)
     {
         if(!strcmp(ALlista[i].nome, reg->nome))
         {
+            if(ALlista[i].excluido == '*')
+            {
+                return AL_NAO_ACHEI;
+            }
             return i;
         }
     }
 
     return AL_NAO_ACHEI;
+}
+
+void ALexcluirLogico(struct ALregistro *reg)
+{
+    int indice;
+
+    indice = ALbuscarPorValor(reg);
+    if(indice != AL_NAO_ACHEI)
+    {
+        ALlista[indice].excluido='*';
+    }
 }
 
 void ALexcluir(struct ALregistro *reg)

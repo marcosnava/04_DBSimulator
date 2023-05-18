@@ -13,6 +13,7 @@ struct ALregistro
     char nome[101];
     char endereco[101];
     char telefone[21];
+    char excluido;
 };
 
 // Constantes
@@ -32,6 +33,7 @@ int ALquantidadeElementos();
 BOOLEAN ALbuscarPorIndice(int indice, struct ALregistro *reg);
 int ALbuscarPorValor(struct ALregistro *reg);
 void ALexcluir(struct ALregistro *reg);
+void ALexcluirLogico(struct ALregistro *reg);
 void ALexpandir();
 
 void ALinicializar();

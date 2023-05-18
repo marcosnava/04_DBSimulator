@@ -141,7 +141,7 @@ void adicionar(struct ALregistro reg)
 void excluir(struct ALregistro reg)
 {
     // excluir no array list
-    ALexcluir(&reg);
+    ALexcluirLogico(&reg);
 
     // excluir na lista duplamente ligada
     LLexcluir(reg.nome);
@@ -153,11 +153,12 @@ void listarFisico()
     int i;
     for(i = 0; i < ALquantidadeElementos(); i++)
     {
-        ALbuscarPorIndice(i, &registro);
-        printf("Registro.: %d\n", i);
-        printf("Nome.....: %s\n", registro.nome);
-        printf("Endereco.: %s\n", registro.endereco);
-        printf("Telefone.: %s\n\n", registro.telefone);
+        if(ALbuscarPorIndice(i, &registro)) {
+            printf("Registro.: %d\n", i);
+            printf("Nome.....: %s\n", registro.nome);
+            printf("Endereco.: %s\n", registro.endereco);
+            printf("Telefone.: %s\n\n", registro.telefone);
+        }
     }
     printf("FIM DO ARQUIVO\n");
 }

@@ -31,6 +31,7 @@ extern int ALposicao;
 BOOLEAN ALadicionar(struct ALregistro *reg, int *nReg);
 int ALquantidadeElementos();
 BOOLEAN ALbuscarPorIndice(int indice, struct ALregistro *reg);
+BOOLEAN ALbuscarExcluido(int indice, struct ALregistro *reg);
 int ALbuscarPorValor(struct ALregistro *reg);
 void ALexcluir(struct ALregistro *reg);
 void ALexcluirLogico(struct ALregistro *reg);

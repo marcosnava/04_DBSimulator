@@ -2,10 +2,10 @@
 #include <string.h>
 #include "arrayList.h"
 #include "listaDuplamenteLigada.h"
+#include "arvoreBinaria.h"
 
 // Variaveis
 struct ALregistro registro;
-struct LLno no;
 
 // Constantes
 enum
@@ -13,9 +13,11 @@ enum
     OP_NAO_SELECIONADA = 0,
     OP_ADICIONAR,
     OP_EXCLUIR,
+    OP_LOCALIZAR,
     OP_LISTAR_FISICO,
     OP_LISTAR_LOGICO_CRESCENTE,
     OP_LISTAR_LOGICO_DECRESCENTE,
+    OP_REORGANIZAR_INDICES,
     OP_SAIR,
 };
 
@@ -24,9 +26,11 @@ void inicializar();
 void finalizar();
 void adicionar(struct ALregistro reg);
 void excluir(struct ALregistro reg);
+void localizar(struct ALregistro reg);
 void listarFisico();
 void listarLogicoCrescente();
 void listarLogicoDecrescente();
+void reorganizarIndices();
 int menu();
 
 int main() {
@@ -70,6 +74,15 @@ int main() {
 
                 excluir(registro);
                 break;
+            case OP_LOCALIZAR:
+                printf("Digite o nome: ");
+                fgets(nome, 100, stdin);
+                nome[strcspn(nome, "\n")] = 0;
+
+                strcpy(registro.nome, nome);
+
+                localizar(registro);
+                break;
             case OP_LISTAR_FISICO:
                 listarFisico();
                 break;
@@ -78,6 +91,9 @@ int main() {
                 break;
             case OP_LISTAR_LOGICO_DECRESCENTE:
                 listarLogicoDecrescente();
+                break;
+            case OP_REORGANIZAR_INDICES:
+                reorganizarIndices();
                 break;
             case OP_SAIR:
                 break;
@@ -96,12 +112,14 @@ void inicializar()
 {
     ALinicializar();
     LLinicializar();
+    ABinicializar();
 }
 
 void finalizar()
 {
     ALfinalizar();
     LLfinalizar();
+    ABfinalizar(ABinicio);
 }
 
 int menu()
@@ -110,9 +128,11 @@ int menu()
 
     printf("%d - Adicionar\n", OP_ADICIONAR);
     printf("%d - Excluir\n", OP_EXCLUIR);
+    printf("%d - Localizar\n", OP_LOCALIZAR);
     printf("%d - Listar ordem Fisica\n", OP_LISTAR_FISICO);
     printf("%d - Listar ordem Logica Crescente\n", OP_LISTAR_LOGICO_CRESCENTE);
     printf("%d - Listar ordem Logica Decrescente\n", OP_LISTAR_LOGICO_DECRESCENTE);
+    printf("%d - Reorganizar Indices\n", OP_REORGANIZAR_INDICES);
     printf("%d - Sair\n", OP_SAIR);
     printf("Selecione sua opcao: ");
     scanf("%d", &op);
@@ -126,16 +146,27 @@ void adicionar(struct ALregistro reg)
     BOOLEAN deuCerto = FALSE;
     int nRegistro = 0;
 
-    // adicionar no array list
-    deuCerto = ALadicionar(&registro, &nRegistro);
-    if(!deuCerto)
-    {
-        ALexpandir();
-        ALadicionar(&registro, &nRegistro);
-    }
+    struct ABno *no = ABlocalizar(ABinicio, reg.nome);
 
-    // adicionar na lista duplamente ligada
-    LLadicionar(reg.nome, nRegistro);
+    if(no != NULL)
+    {
+        printf("Registro ja existe!\n");
+    }
+    else {
+
+        // adicionar no array list
+        deuCerto = ALadicionar(&registro, &nRegistro);
+        if (!deuCerto) {
+            ALexpandir();
+            ALadicionar(&registro, &nRegistro);
+        }
+
+        // adicionar na lista duplamente ligada
+        LLadicionar(reg.nome, nRegistro);
+
+        // adicionar na árvore binária
+        ABadicionar(ABinicio, ABnovoNo(reg.nome, nRegistro));
+    }
 }
 
 void excluir(struct ALregistro reg)
@@ -145,6 +176,29 @@ void excluir(struct ALregistro reg)
 
     // excluir na lista duplamente ligada
     LLexcluir(reg.nome);
+
+    // excluir na árvore binária
+    ABexcluir(reg.nome);
+}
+
+void localizar(struct ALregistro reg)
+{
+    struct ABno *no = NULL;
+    no = ABlocalizar(ABinicio, reg.nome);
+    if(no == NULL)
+    {
+        printf("Registro nao localizado!\n");
+    }
+    else
+    {
+        if(ALbuscarPorIndice(no->reg, &registro))
+        {
+            printf("Registro.: %d\n", no->reg);
+            printf("Nome.....: %s\n", registro.nome);
+            printf("Endereco.: %s\n", registro.endereco);
+            printf("Telefone.: %s\n", registro.telefone);
+        }
+    }
 }
 
 void listarFisico()
@@ -193,4 +247,29 @@ void listarLogicoDecrescente()
             printf("Telefone.: %s\n\n", registro.telefone);
         }
     } while(LLanterior());
+}
+
+void reorganizarIndices()
+{
+    LLfinalizar();
+    ABfinalizar(ABinicio);
+
+    LLinicializar();
+    ABinicializar();
+
+    int i;
+    for(i = 0; i < ALquantidadeElementos(); i++)
+    {
+        if(ALbuscarExcluido(i, &registro)) {
+            ALexcluir(&registro);
+        }
+    }
+
+    for(i = 0; i < ALquantidadeElementos(); i++)
+    {
+        if(ALbuscarPorIndice(i, &registro)) {
+            LLadicionar(registro.nome, i);
+            ABadicionar(ABinicio, ABnovoNo(registro.nome, i));
+        }
+    }
 }

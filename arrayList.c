@@ -54,6 +54,25 @@ BOOLEAN ALbuscarPorIndice(int indice, struct ALregistro *reg)
     }
 }
 
+BOOLEAN ALbuscarExcluido(int indice, struct ALregistro *reg)
+{
+    if(indice < 0 || indice >= ALposicao)
+    {
+        return FALSE;
+    }
+    else
+    {
+        if(ALlista[indice].excluido != '*')
+        {
+            return FALSE;
+        }
+        strcpy(reg->nome, ALlista[indice].nome);
+        strcpy(reg->endereco, ALlista[indice].endereco);
+        strcpy(reg->telefone, ALlista[indice].telefone);
+        return TRUE;
+    }
+}
+
 int ALbuscarPorValor(struct ALregistro *reg)
 {
     int i;

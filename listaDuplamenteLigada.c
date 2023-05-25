@@ -41,7 +41,7 @@ struct LLno *LLnovoNo(char *nome, int reg)
     p = malloc(sizeof (struct LLno));
     if(!p)
     {
-        printf("Nao tem memoria!\n");
+        printf("Erro fatal! Nao existe memoria disponivel!\n");
         exit(-1);
     }
 
